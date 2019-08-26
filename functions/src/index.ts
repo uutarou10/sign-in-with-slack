@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { oauthAccess } from './slack';
+import { oauthAccess, usersInfo } from './slack';
 import { URL } from 'url';
 
 admin.initializeApp();
@@ -15,12 +15,6 @@ exports.authWithSlack = functions.https.onRequest(async (req, res) => {
   }
 
   const userCredential = await oauthAccess(slackAuthCode);
-
-  if (userCredential.team_id !== 'T029ACBGM') {
-    console.warn(`This team (id: ${userCredential.team_id}) dose not have access rights.`);
-    res.status(403).end();
-    return;
-  }
 
   try {
     const customToken = await admin.auth().createCustomToken(userCredential.user_id);
